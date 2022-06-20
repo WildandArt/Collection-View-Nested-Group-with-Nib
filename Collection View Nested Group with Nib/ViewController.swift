@@ -52,13 +52,16 @@ extension ViewController{
 
     }
     private func configureHierarchy(){
+
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: createLayout())
-        view.addSubview(collectionView)
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        collectionView.register(UINib(nibName: "nibCell", bundle: nil), forCellWithReuseIdentifier: nibCell.reuseIdentifier)
+
+        view.addSubview(collectionView)
 
     }
     private func configureDataSource(){
+        //IN CASE: you don't want to use NIBS see below
+
 //        let cellRegistration = UICollectionView.CellRegistration<TextCell, Int> { cell, indexPath, itemIdentifier in
 //            cell.label.text = "\(indexPath)"
 //            cell.layer.borderWidth = 1.0
@@ -69,9 +72,13 @@ extension ViewController{
 //            cell.layer.borderWidth = 1.0
 //            cell.layer.borderColor = UIColor.label.cgColor
 //        }
-
+        let cellRegistration = UICollectionView.CellRegistration<nibCell, Int>(cellNib: UINib(nibName: "nibCell", bundle: nil)) { cell , indexPath, itemIdentifier in
+            cell.labelOutlet.text = "\(itemIdentifier)"
+            cell.layer.borderWidth = 1
+        }
         dataSource = UICollectionViewDiffableDataSource <Section, Int>(collectionView: collectionView, cellProvider: { (collectionView, indexPath, itemIdentifier: Int)-> UICollectionViewCell in
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nibCell.reuseIdentifier, for: indexPath)
+//            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nibCell.reuseIdentifier, for: indexPath)
+            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
             return cell
         })
 
